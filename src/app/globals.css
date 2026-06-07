@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@reference;
+
+/* Base Styles */
+body {
+  @apply font-sans bg-white text-gray-900 antialiased;
+}
+
+/* Custom Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.4s ease-out forwards;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+/* Layout Utilities */
+.section-luxury {
+  @apply py-24 md:py-32 px-6;
+}
+
+/* Custom Buttons Base Style (Chanel Vibe) */
+.btn-luxury {
+  @apply inline-block px-10 py-3.5 text-[11px] font-semibold tracking-[0.25em] uppercase transition-all duration-500 border border-gray-900;
+}
+
+.btn-primary {
+  @apply bg-gray-900 text-white hover:bg-white hover:text-gray-900 inline-block px-10 py-3.5 text-[11px] font-semibold tracking-[0.25em] uppercase transition-all duration-500 border border-gray-900;
+}
+
+.btn-secondary {
+  @apply bg-transparent text-gray-900 hover:bg-gray-900 hover:text-white inline-block px-10 py-3.5 text-[11px] font-semibold tracking-[0.25em] uppercase transition-all duration-500 border border-gray-900;
+}
+
+/* Custom Input Style (Minimal Underline) */
+.input-luxury {
+  @apply w-full bg-transparent border-b border-gray-200 focus:border-gray-900 py-3 text-sm text-gray-900 placeholder-gray-300 tracking-wider outline-none transition-colors duration-300;
+}
