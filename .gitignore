@@ -4,3 +4,5 @@ dist
 build
 .env
 temp-app/node_modules
+.env.local
+.env*.local
