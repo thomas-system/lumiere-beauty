@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -10,149 +12,146 @@ export default function SignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    dob: "",
-    gender: "",
   });
-  
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleChange = (e: any) => {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+      setError("Passwords do not match");
       return;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters!");
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+        },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
       return;
     }
 
     setSuccess(true);
-    setTimeout(() => {
-      window.location.href = "/login";
-    }, 2000);
+    setTimeout(() => router.push("/login"), 3000);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 flex items-center justify-center py-12 px-4 animate-fade-in">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-pink-100 p-8 space-y-6">
-        
-        <div className="text-center">
-          <h2 className="text-3xl font-serif font-bold text-gray-900">Join Lumière 💖</h2>
-          <p className="mt-2 text-sm text-gray-500">Create an account to start your beauty journey</p>
+    <div className="min-h-screen bg-[#fdf8f5] flex items-center justify-center px-4 py-12 animate-fade-in">
+      <div className="w-full max-w-sm bg-white border border-[#e8d5c4] p-10 shadow-sm">
+
+        <div className="text-center mb-10">
+          <p className="text-[10px] font-semibold text-[#c9a882] tracking-[0.3em] uppercase mb-3">Lumière Beauty</p>
+          <h1 className="text-2xl font-serif text-[#1a1a1a] tracking-wide">Create Account</h1>
         </div>
 
-        {/* Success Message */}
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-center text-sm font-medium animate-slide-down">
-            🎉 Account created successfully! Redirecting to login...
-          </div>
-        )}
-
-        {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-center text-sm font-medium animate-slide-down">
-            ❌ {error}
+          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-center text-xs tracking-wider uppercase mb-6">
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Fields */}
-          <div className="grid grid-cols-2 gap-4">
+        {success && (
+          <div className="bg-green-50 border border-green-100 text-green-700 px-4 py-3 text-center text-xs tracking-wider mb-6">
+            ✓ Account created! Please check your email to confirm, then sign in.
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">First Name</label>
-              <input 
-                type="text" name="firstName" required value={formData.firstName} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 placeholder-pink-300"
+              <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">First Name</label>
+              <input
+                type="text" name="firstName" required
+                value={formData.firstName} onChange={handleChange}
+                className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
                 placeholder="Sarah"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Last Name</label>
-              <input 
-                type="text" name="lastName" required value={formData.lastName} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 placeholder-pink-300"
+              <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Last Name</label>
+              <input
+                type="text" name="lastName" required
+                value={formData.lastName} onChange={handleChange}
+                className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
                 placeholder="Johnson"
               />
             </div>
           </div>
 
-          {/* Email */}
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Email Address</label>
-            <input 
-              type="email" name="email" required value={formData.email} onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 placeholder-pink-300"
+            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Email Address</label>
+            <input
+              type="email" name="email" required
+              value={formData.email} onChange={handleChange}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
               placeholder="you@example.com"
             />
           </div>
 
-          {/* Passwords */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Create Password</label>
-              <input 
-                type="password" name="password" required value={formData.password} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 placeholder-pink-300"
-                placeholder="Min 8 chars"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Confirm Password</label>
-              <input 
-                type="password" name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 placeholder-pink-300"
-                placeholder="Rewrite password"
-              />
-            </div>
+          <div>
+            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Password</label>
+            <input
+              type="password" name="password" required
+              value={formData.password} onChange={handleChange}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
+              placeholder="Min. 8 characters"
+            />
           </div>
 
-          {/* DOB & Gender */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Date of Birth</label>
-              <input 
-                type="date" name="dob" required value={formData.dob} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 text-gray-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wider">Gender</label>
-              <select 
-                name="gender" required value={formData.gender} onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent text-sm bg-pink-50/30 text-gray-500"
-              >
-                <option value="" disabled>Select</option>
-                <option value="female">Female</option>
-                <option value="male">Male</option>
-                <option value="other">Other</option>
-                <option value="prefer-not-to-say">Prefer not to say</option>
-              </select>
-            </div>
+          <div>
+            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Confirm Password</label>
+            <input
+              type="password" name="confirmPassword" required
+              value={formData.confirmPassword} onChange={handleChange}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
+              placeholder="Repeat password"
+            />
           </div>
 
-          <button 
-            type="submit" 
-            className="w-full bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 rounded-xl font-semibold hover:from-pink-700 hover:to-rose-600 transition-all shadow-md hover:shadow-lg text-sm"
+          <button
+            type="submit"
+            disabled={isLoading || success}
+            className="w-full bg-[#1a1a1a] text-white py-3 text-[11px] font-semibold tracking-[0.2em] uppercase hover:bg-[#333] transition-colors disabled:opacity-50 mt-2"
           >
-            Create Account
+            {isLoading ? "Creating Account..." : success ? "✓ Account Created" : "Create Account"}
           </button>
         </form>
 
-        <div className="text-center text-sm text-gray-500">
+        <p className="text-center text-[11px] text-gray-400 mt-8">
           Already have an account?{" "}
-          <Link href="/login" className="text-pink-600 font-semibold hover:text-pink-700">
+          <Link href="/login" className="text-[#c9a882] hover:underline font-medium">
             Sign In
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

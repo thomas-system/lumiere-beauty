@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -9,70 +11,96 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: any) => {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess(false);
+    setIsLoading(true);
 
-    if (!email || !password) { setError("All fields are required"); return; }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (password === "password123") {
-      setIsLoading(true);
-      
-      // محاكاة للـ Google OAuth بناخد صورة الإيميل
-      const profileImage = `https://ui-avatars.com/api/?name=${email}&background=111827&color=fff&size=128`;
-      
-      setTimeout(() => {
-        setIsLoading(false);
-        setSuccess(true);
-        localStorage.setItem('lumiere_user_image', profileImage); // بحفظ الصورة
-        
-        setTimeout(() => { window.location.href = "/"; }, 1500);
-      }, 2000);
-    } else {
-      setError("Invalid credentials. Please try again.");
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
+      return;
     }
+
+    setSuccess(true);
+    router.push("/");
+    router.refresh();
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center py-12 px-4 animate-fade-in">
-      <div className="max-w-md w-full bg-white p-12 shadow-sm border border-gray-100 space-y-8">
-        
-        <div className="text-center">
-          <p className="text-gray-400 font-semibold tracking-[0.4em] uppercase mb-4 text-[10px]">Account</p>
-          <h2 className="text-3xl font-serif font-medium text-gray-900">Sign In</h2>
+    <div className="min-h-screen bg-[#fdf8f5] flex items-center justify-center px-4 animate-fade-in">
+      <div className="w-full max-w-sm bg-white border border-[#e8d5c4] p-10 shadow-sm">
+
+        <div className="text-center mb-10">
+          <p className="text-[10px] font-semibold text-[#c9a882] tracking-[0.3em] uppercase mb-3">Lumière Beauty</p>
+          <h1 className="text-2xl font-serif text-[#1a1a1a] tracking-wide">Welcome Back</h1>
         </div>
 
-        {success && (
-          <div className="bg-gray-900 text-white px-4 py-3 text-center text-sm tracking-wider animate-slide-down">
-            WELCOME BACK
+        {error && (
+          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-center text-xs tracking-wider uppercase mb-6">
+            {error}
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 text-center text-xs tracking-wider uppercase">
-            {error}
+        {success && (
+          <div className="bg-green-50 border border-green-100 text-green-700 px-4 py-3 text-center text-xs tracking-wider uppercase mb-6">
+            ✓ Signed in successfully
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Email Address</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="input-luxury" placeholder="you@example.com" />
+            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
+              placeholder="you@example.com"
+            />
           </div>
 
           <div>
-            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">Password</label>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="input-luxury" placeholder="Enter your password" />
+            <label className="block text-[10px] font-semibold text-gray-400 mb-2 uppercase tracking-[0.2em]">
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c9a882] transition-colors"
+              placeholder="Enter your password"
+            />
           </div>
 
-          <button type="submit" disabled={isLoading || success} className="btn-luxury w-full flex justify-center">
-            {isLoading ? 'AUTHENTICATING...' : success ? 'SUCCESS' : 'SIGN IN'}
+          <button
+            type="submit"
+            disabled={isLoading || success}
+            className="w-full bg-[#1a1a1a] text-white py-3 text-[11px] font-semibold tracking-[0.2em] uppercase hover:bg-[#333] transition-colors disabled:opacity-50"
+          >
+            {isLoading ? "Signing In..." : success ? "✓ Success" : "Sign In"}
           </button>
         </form>
 
-        <p className="text-center text-[10px] text-gray-400 tracking-wider">(Hint: password is <b>password123</b>)</p>
+        <p className="text-center text-[11px] text-gray-400 mt-8">
+          New to Lumière?{" "}
+          <Link href="/signup" className="text-[#c9a882] hover:underline font-medium">
+            Create Account
+          </Link>
+        </p>
       </div>
     </div>
   );
