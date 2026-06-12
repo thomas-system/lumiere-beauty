@@ -1,104 +1,103 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useWishlistStore } from "../store/wishlistStore";
-
-const initialItems = [
-  { id: 1, name: "Rose Petal Hydrating Serum", price: 68, comparePrice: 85, image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80", category: "Skincare" },
-  { id: 2, name: "Velvet Matte Lipstick", price: 32, image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&q=80", category: "Makeup" },
-  { id: 3, name: "Midnight Rose Eau de Parfum", price: 120, comparePrice: 145, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&q=80", category: "Fragrances" },
-  { id: 4, name: "Vitamin C Radiance Cream", price: 75, image: "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=500&q=80", category: "Skincare" },
-  { id: 5, name: "Luminous Highlighter Palette", price: 48, image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&q=80", category: "Makeup" },
-  { id: 6, name: "Argan Oil Repair Shampoo", price: 32, image: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=500&q=80", category: "Hair Care" },
-  { id: 7, name: "Shea Butter Body Lotion", price: 28, image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=500&q=80", category: "Body Care" },
-  { id: 8, name: "Ultimate Skincare Gift Set", price: 165, comparePrice: 210, image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=500&q=80", category: "Gift Sets" },
-];
+import Link from "next/link";
+import { useWishlistStore } from "@/app/store/wishlistStore";
+import { useCartStore } from "@/app/store/cartStore";
 
 export default function WishlistPage() {
-  const { removeItem, setCount } = useWishlistStore();
+  const wishlist = useWishlistStore((state) => state.wishlist) || []; // حماية من الـ undefined
+  const removeItem = useWishlistStore((state) => state.removeItem);
+  const hydrateWishlist = useWishlistStore((state) => state.hydrate);
   
-  const [items, setItems] = useState(initialItems);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const addItemToCart = useCartStore((state) => state.addItem);
+  
+  const [mounted, setMounted] = useState(false);
 
-  // لما الصفحة تفتح، بيجيب المنتجات المحفوظة من الذاكرة
   useEffect(() => {
-    const savedItems = localStorage.getItem('wishlistItems');
-    if (savedItems) {
-      const parsedItems = JSON.parse(savedItems);
-      setItems(parsedItems);
-      setCount(parsedItems.length); // يظبط الرقم فوق القلب على حسب المنتجات المحفوظة
-    }
-    setIsLoaded(true);
-  }, []);
+    hydrateWishlist();
+    setMounted(true);
+  }, [hydrateWishlist]);
 
-  const handleRemove = (id: number) => {
-    const newItems = items.filter(item => item.id !== id);
-    setItems(newItems);
-    removeItem(); // يقلل الرقم اللي فوق القلب
-    localStorage.setItem('wishlistItems', JSON.stringify(newItems)); // يحفظ المنتجات الجديدة في الذاكرة
-  };
-
-  if (!isLoaded) return null; // يستنى لحد ما البيانات تتحمل
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <div className="animate-pulse text-gray-300 text-sm tracking-widest">LOADING...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-fade-in min-h-screen bg-pink-50/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        
-        <div className="text-center mb-14">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
-            My <span className="text-pink-600">Wishlist</span> 💖
-          </h1>
-          <p className="text-gray-500 text-lg">Products you absolutely adore</p>
+    <main className="min-h-screen bg-[#FAFAFA] relative overflow-hidden">
+      {/* Background blurs */}
+      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-rose-50 opacity-50 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] rounded-full bg-rose-100 opacity-30 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
+        {/* Breadcrumb - غيرنا اللينك عشان يروح للهوم بدل الشوب */}
+        <div className="flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase text-gray-400 mb-10">
+          <Link href="/" className="hover:text-gray-900 transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-gray-900">Wishlist</span>
         </div>
 
-        {items.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-pink-100">
-            <span className="text-6xl block mb-6">🤍</span>
-            <h2 className="text-2xl font-serif font-semibold text-gray-900 mb-4">Your wishlist is empty</h2>
-            <p className="text-gray-500 mb-8">Explore our collection and save your favorites!</p>
-            <a href="/shop" className="bg-pink-600 text-white px-8 py-3 rounded-full font-medium hover:bg-pink-700 transition-all shadow-md hover:shadow-lg">
-              Start Shopping
-            </a>
+        <div className="text-center mb-12">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-gray-400 font-medium mb-2">Your Collection</p>
+          <h1 className="font-serif text-3xl font-light text-gray-900">Wishlist</h1>
+        </div>
+
+        {wishlist.length === 0 ? (
+          <div className="text-center py-20">
+            <span className="text-3xl block mb-4 text-gray-200">✦</span>
+            <p className="font-serif text-lg font-light text-gray-900 mb-2">Your wishlist is empty</p>
+            <p className="text-xs text-gray-400 font-light mb-6">Save your favorite items for later</p>
+            {/* غيرنا اللينك هنا يروح للهوم عشان ميجبش 404 */}
+            <Link href="/" className="px-6 py-2.5 bg-gray-900 text-white text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-stone-800 transition-colors">
+              Continue Shopping
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-3xl border border-pink-100 overflow-hidden group hover:shadow-xl hover:border-pink-200 transition-all duration-300 relative">
-                
-                <button 
-                  onClick={() => handleRemove(item.id)}
-                  className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm p-1.5 rounded-full hover:bg-red-50 hover:text-red-500 text-pink-300 transition-all shadow-sm"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-
-                <div className="relative overflow-hidden aspect-square bg-pink-50">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  {item.comparePrice && (
-                    <span className="absolute top-3 left-3 bg-gradient-to-r from-pink-600 to-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
-                      SALE
-                    </span>
-                  )}
-                </div>
-                
-                <div className="p-4">
-                  <p className="text-[10px] text-pink-400 font-semibold uppercase tracking-wider mb-1">{item.category}</p>
-                  <h3 className="font-serif font-semibold text-gray-900 leading-tight mb-3 text-sm">{item.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-gray-900">${item.price}</span>
-                      {item.comparePrice && <span className="text-xs text-gray-400 line-through">${item.comparePrice}</span>}
+          <>
+            <p className="text-[10px] text-gray-400 font-light mb-8">{wishlist.length} item{wishlist.length !== 1 ? "s" : ""} saved</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {wishlist.map((item: any) => (
+                <div key={item.id} className="group bg-white border border-gray-100 hover:border-gray-300 transition-colors overflow-hidden relative">
+                  <Link href={"/shop/" + item.id} className="block">
+                    <div className="aspect-[4/5] overflow-hidden bg-gray-50">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     </div>
-                    <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs px-3 py-1.5 rounded-full font-medium hover:from-pink-600 hover:to-rose-600 transition-all shadow-sm">
+                    <div className="p-4">
+                      <p className="text-[9px] text-rose-400 uppercase tracking-[0.2em] mb-1">{item.category}</p>
+                      <p className="font-serif text-sm font-light text-gray-900 leading-snug mb-2">{item.name}</p>
+                      <p className="text-sm font-medium text-gray-900">{item.price} EGP</p>
+                    </div>
+                  </Link>
+                  <div className="px-4 pb-4 flex gap-2">
+                    <button
+                      onClick={() => {
+                        addItemToCart({ id: item.id, name: item.name, price: item.price, image: item.image, category: item.category });
+                        removeItem(item.id);
+                      }}
+                      className="flex-1 py-2.5 bg-gray-900 text-white text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-rose-700 transition-colors"
+                    >
                       Add to Cart
+                    </button>
+                    <button 
+                      onClick={() => removeItem(item.id)} 
+                      className="px-3 py-2.5 border border-gray-200 text-gray-400 hover:text-rose-600 hover:border-rose-600 transition-colors"
+                      aria-label="Remove from wishlist"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
-    </div>
+    </main>
   );
 }

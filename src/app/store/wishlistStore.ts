@@ -1,43 +1,48 @@
 import { create } from 'zustand'
 
+export interface WishlistItem {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+}
+
 interface WishlistState {
-  count: number;
+  items: WishlistItem[];
   hydrated: boolean;
-  addItem: () => void;
-  removeItem: () => void;
-  setCount: (count: number) => void;
   hydrate: () => void;
+  addItem: (item: WishlistItem) => void;
+  removeItem: (id: number) => void;
+  isInWishlist: (id: number) => boolean;
+  count: () => number;
 }
 
 export const useWishlistStore = create<WishlistState>((set, get) => ({
-  count: 8, // الرقم الافتراضي للسيرفر
+  items: [],
   hydrated: false,
-  
+
   hydrate: () => {
     if (typeof window !== 'undefined' && !get().hydrated) {
-      const savedCount = localStorage.getItem('wishlistCount');
-      if (savedCount) {
-        set({ count: parseInt(savedCount), hydrated: true });
-      } else {
-        set({ hydrated: true });
-      }
+      const saved = localStorage.getItem('wishlistItems');
+      if (saved) set({ items: JSON.parse(saved), hydrated: true });
+      else set({ hydrated: true });
     }
   },
-  
-  addItem: () => set((state) => {
-    const newCount = state.count + 1;
-    if (typeof window !== 'undefined') localStorage.setItem('wishlistCount', newCount.toString());
-    return { count: newCount };
-  }),
-  
-  removeItem: () => set((state) => {
-    const newCount = Math.max(0, state.count - 1);
-    if (typeof window !== 'undefined') localStorage.setItem('wishlistCount', newCount.toString());
-    return { count: newCount };
+
+  addItem: (item) => set((state) => {
+    if (state.items.find(i => i.id === item.id)) return state;
+    const items = [...state.items, item];
+    if (typeof window !== 'undefined') localStorage.setItem('wishlistItems', JSON.stringify(items));
+    return { items };
   }),
 
-  setCount: (count: number) => set(() => {
-    if (typeof window !== 'undefined') localStorage.setItem('wishlistCount', count.toString());
-    return { count };
+  removeItem: (id) => set((state) => {
+    const items = state.items.filter(i => i.id !== id);
+    if (typeof window !== 'undefined') localStorage.setItem('wishlistItems', JSON.stringify(items));
+    return { items };
   }),
+
+  isInWishlist: (id) => get().items.some(i => i.id === id),
+  count: () => get().items.length,
 }))

@@ -1,92 +1,92 @@
+"use client";
+
+import Link from "next/link";
+import { useLanguage } from "../components/LanguageContext";
+
 export default function AboutPage() {
+  const { language, t } = useLanguage();
+
   return (
-    <div className="animate-fade-in">
-      {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center bg-gradient-to-br from-red-100 via-rose-50 to-pink-50 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 right-10 w-[400px] h-[400px] bg-red-200 rounded-full filter blur-3xl"></div>
-          <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-rose-200 rounded-full filter blur-3xl"></div>
-        </div>
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <p className="text-rose-700 font-medium tracking-[0.3em] uppercase mb-4 animate-slide-down text-sm">Our Partnership</p>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold text-gray-900 mb-6 leading-tight animate-slide-up">
-            Powered by <span className="text-red-700">PTG China</span>
+    <main className="min-h-screen bg-nude-50 relative overflow-hidden" dir={language === "ar" ? "rtl" : "ltr"}>
+      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-nude-200 opacity-40 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] rounded-full bg-nude-300 opacity-30 blur-3xl" />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-16">
+        <div className="text-center mb-16">
+          <p className="text-[10px] tracking-[0.3em] uppercase text-nude-300 font-medium mb-2">
+            {t("Our Story", "قصتنا")}
+          </p>
+          <h1 className="font-serif text-3xl md:text-4xl font-light text-gray-900 mb-6">
+            {t("About Lumière", "عن لوميير")}
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 animate-fade-in font-light max-w-2xl mx-auto">
-            Bringing world-class Chinese beauty innovations and wellness products to your doorstep.
+          <div className="w-16 h-px bg-nude-300 mx-auto mb-8" />
+          <p className="text-sm text-nude-300 font-light leading-relaxed max-w-2xl mx-auto">
+            {t(
+              "Born from a passion for beauty and a belief that everyone deserves to feel radiant, Lumière was founded with a simple mission: to bring luxury skincare and beauty within everyone's reach.",
+              "وُلدت لوميير من شغف بالجمال وإيمان بأن كل شخص يستحق أن يشعر بالإشراق. تأسست بمهمة بسيطة: جعل العناية الفاخرة بالبشرة في متناول الجميع."
+            )}
           </p>
         </div>
-      </section>
 
-      {/* Story Content */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 lg:px-16">
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-24">
-            <div>
-              <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80" alt="PTG Beauty" className="rounded-3xl shadow-2xl hover:shadow-3xl transition-shadow duration-500" />
-            </div>
-            <div>
-              <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">A Global Legacy, A Local Promise</h2>
-              <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                As a proud partner of PTG China, a global leader in health, beauty, and wellness, I bring you a curated selection of products that combine ancient Eastern botanical wisdom with cutting-edge scientific research.
-              </p>
-              <p className="text-gray-600 leading-relaxed text-lg">
-                PTG has empowered millions worldwide through its direct-selling model, offering premium quality at accessible prices. My mission is to deliver this same transformative experience directly to you, with personalized service and trusted advice.
-              </p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="aspect-[3/4] overflow-hidden bg-nude-100">
+            <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=800&fit=crop" alt="Beauty" className="w-full h-full object-cover" />
           </div>
-
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-24">
-            <div className="order-2 md:order-1">
-              <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">Why Shop With Me?</h2>
-              <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-                When you buy through my platform, you are not just getting exceptional PTG products, you are getting a dedicated beauty consultant. I provide personalized skincare routines, exclusive member discounts, and 1-on-1 support to help you achieve your beauty goals.
-              </p>
-              <div className="flex space-x-6 mt-8">
-                <div className="text-center">
-                  <div className="text-3xl font-serif font-bold text-red-700">100%</div>
-                  <div className="text-sm text-gray-500 mt-1">Authentic PTG</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-serif font-bold text-red-700">1-on-1</div>
-                  <div className="text-sm text-gray-500 mt-1">Consultation</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-serif font-bold text-red-700">VIP</div>
-                  <div className="text-sm text-gray-500 mt-1">Member Prices</div>
-                </div>
-              </div>
-            </div>
-            <div className="order-1 md:order-2">
-              <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80" alt="Personal Consultant" className="rounded-3xl shadow-2xl hover:shadow-3xl transition-shadow duration-500" />
-            </div>
+          <div className="flex flex-col justify-center">
+            <p className="text-[9px] tracking-[0.3em] uppercase text-nude-300 font-medium mb-2">
+              {t("The Beginning", "البداية")}
+            </p>
+            <h2 className="font-serif text-2xl font-light text-gray-900 mb-4">
+              {t("Where Light Meets Beauty", "حيث يلتقي الضوء بالجمال")}
+            </h2>
+            <p className="text-sm text-nude-300 font-light leading-relaxed mb-4">
+              {t(
+                "Lumière — French for \"light\" — represents the inner radiance that beauty can unlock. We carefully curate products from the world's finest formulations, ensuring every product meets our high standards of quality, efficacy, and sustainability.",
+                "لوميير — كلمة فرنسية تعني \"الضوء\" — تمثّل الإشراق الداخلي الذي يمنحه الجمال. نختار منتجاتنا بعناية من أرقى التركيبات العالمية، لضمان أن كل منتج يلبي معاييرنا العالية من الجودة والفاعلية والاستدامة."
+              )}
+            </p>
+            <p className="text-sm text-nude-300 font-light leading-relaxed">
+              {t(
+                "From our lab in Cairo to your doorstep, every Lumière product is crafted with care, backed by science, and inspired by the timeless beauty of the Mediterranean.",
+                "من مختبرنا في القاهرة إلى بابك، كل منتج لوميير يُصنع بعناية، مدعوم بالعلم، ومستوحى من جمال البحر الأبيض المتوسط الخالد."
+              )}
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* Values Grid */}
-      <section className="py-20 bg-gradient-to-b from-nude-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-center text-gray-900 mb-16">The PTG Promise</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-3xl p-10 text-center border border-rose-100 hover:border-red-300 hover:shadow-xl transition-all duration-300 group">
-              <span className="text-5xl block mb-6 group-hover:scale-110 transition-transform">🔬</span>
-              <h3 className="text-2xl font-serif font-semibold text-gray-900 mb-4">Scientific Innovation</h3>
-              <p className="text-gray-600 leading-relaxed">Advanced formulas developed in state-of-the-art Chinese laboratories, blending traditional herbs with modern science.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {[
+            { number: "50+", labelEn: "Products", labelAr: "منتج", descEn: "Curated beauty essentials", descAr: "أساسيات جمالية مختارة" },
+            { number: "10K+", labelEn: "Happy Customers", labelAr: "عميلة سعيدة", descEn: "Across Egypt & the region", descAr: "في مصر والمنطقة" },
+            { number: "100%", labelEn: "Authentic", labelAr: "أصلي", descEn: "Genuine products guaranteed", descAr: "منتجات أصلية مضمونة" },
+          ].map((stat) => (
+            <div key={stat.labelEn} className="text-center py-8 bg-white border border-nude-100">
+              <p className="font-serif text-4xl font-light text-gray-900 mb-2">{stat.number}</p>
+              <p className="text-[10px] tracking-[0.2em] uppercase text-gray-900 font-medium mb-1">
+                {language === "ar" ? stat.labelAr : stat.labelEn}
+              </p>
+              <p className="text-[11px] text-nude-300 font-light">
+                {language === "ar" ? stat.descAr : stat.descEn}
+              </p>
             </div>
-            <div className="bg-white rounded-3xl p-10 text-center border border-rose-100 hover:border-red-300 hover:shadow-xl transition-all duration-300 group">
-              <span className="text-5xl block mb-6 group-hover:scale-110 transition-transform">🌱</span>
-              <h3 className="text-2xl font-serif font-semibold text-gray-900 mb-4">Natural Ingredients</h3>
-              <p className="text-gray-600 leading-relaxed">Ethically sourced botanicals from pristine environments, ensuring purity and potency in every drop.</p>
-            </div>
-            <div className="bg-white rounded-3xl p-10 text-center border border-rose-100 hover:border-red-300 hover:shadow-xl transition-all duration-300 group">
-              <span className="text-5xl block mb-6 group-hover:scale-110 transition-transform">🤝</span>
-              <h3 className="text-2xl font-serif font-semibold text-gray-900 mb-4">Empowering Community</h3>
-              <p className="text-gray-600 leading-relaxed">Join a network of entrepreneurs. Build your business with full training, support, and financial freedom.</p>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
-    </div>
-  )
+
+        <div className="bg-gray-900 p-10 md:p-14 text-center">
+          <span className="text-nude-300 text-sm block mb-3">✦</span>
+          <h2 className="font-serif text-2xl font-light text-white mb-3">
+            {t("Join the Lumière Family", "انضمي لعائلة لوميير")}
+          </h2>
+          <p className="text-[11px] text-gray-400 font-light tracking-wider max-w-md mx-auto mb-6">
+            {t("Discover your light with our curated collection of beauty essentials", "اكتشفي ضوءك مع مجموعتنا المختارة من أساسيات الجمال")}
+          </p>
+          <Link href="/shop" className="inline-block px-8 py-3 bg-white text-gray-900 text-[11px] tracking-[0.2em] uppercase font-medium hover:bg-gray-100 transition-colors">
+            {t("Shop Now", "تسوقي الآن")}
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
 }
